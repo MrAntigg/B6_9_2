@@ -1,0 +1,39 @@
+---
+# tasks file for dnsmasq
+- name: install dnsmasq
+  apt:
+        name: dnsmasq
+        state: latest
+        update_cache: true
+
+- name: stop systemd-resolved
+  service:
+        name: systemd-resolved
+        state: stopped
+        enabled: false
+
+- name: remove dnsmasq conf file
+  file:
+        path: /etc/dnsmasq.conf
+        state: absent
+
+- name: remove resolv.conf
+  file:
+        path: /etc/resolv.conf
+        state: absent
+
+- name: copy dnsmasq config
+  copy:
+        src: /home/anti/share/ansible/dnsmasq/dnsmasq.conf
+        dest: /etc/dnsmasq.conf
+
+- name: copy resolv.conf
+  copy:
+        src: /home/anti/share/ansible/dnsmasq/resolv.conf
+        dest: /etc/resolv.conf
+
+- name: start dnsmasq
+  service:
+        name: dnsmasq
+        state: started
+        enabled: true

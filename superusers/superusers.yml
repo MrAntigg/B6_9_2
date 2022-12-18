@@ -1,0 +1,31 @@
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Create group
+      group:
+        name: superusers
+
+    - name: Create user1
+      user:
+        name: user1
+        home: /home/user1/
+        shell: /bin/bash
+        groups: superusers
+        password: $6$mCPiWnhKikktcX90$8Erv3JdbiuPe8F4WjF71.VF5PExQ2qo0pIvtYmEbbldxMi6UDNt842607LPv77Eesnf.N5T.j6yC7lgJkACfl0
+
+    - name: Create user2
+      user:
+        name: user2
+        home: /home/user2/
+        shell: /bin/bash
+        groups: superusers
+        password: $6$HM2drwjg4RZuhmUx$mF50t199spdUvypFNs79.lnUOyISK4d.TvgfOZvjafudL0Z0n7yykIyPTnfIoqS5eMzcrKpV/p0N/pC.PWkLi0
+
+    - name: Validate the sudoers file before saving
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%superusers ALL='
+        line: '%superusers ALL=(ALL) ALL'
+        validate: /usr/sbin/visudo -cf %s

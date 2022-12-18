@@ -1,0 +1,75 @@
+---
+# tasks file for nginx_php_fpm
+- name: uninstall apache
+  apt:
+        name: apache2
+        autoremove: yes
+        state: absent
+
+- name: install nginx
+  apt:
+        name: nginx
+        state: latest
+        update_cache: true
+
+- name: install php-fpm
+  apt:
+    pkg:
+      - php
+      - php-cli
+      - php-fpm
+      - php-json
+      - php-mysql
+      - php-zip
+      - php-gd
+      - php-mbstring
+      - php-curl
+      - php-xml
+      - php-pear
+      - php-bcmath
+    state: latest
+    update_cache: true
+
+- name: start nginx
+  service:
+        name: nginx
+        state: started
+        enabled: true 
+
+- name: del default file
+  file:
+         path: /etc/nginx/sites-available/default
+         state: absent
+
+- name: edit default file
+  copy:
+         src: /home/anti/share/ansible/nginx_php_fpm/default
+         dest: /etc/nginx/sites-available/default
+  notify:
+  - Restart nginx
+ 
+
+- name: del php_fastcgi.conf file
+  file:
+         path: /etc/nginx/php_fastcgi.conf
+         state: absent
+
+- name: edit php_fastcgi.conf file
+  copy:
+         src: /home/anti/share/ansible/nginx_php_fpm/php_fastcgi.conf
+         dest: /etc/nginx/php_fastcgi.conf
+  notify:
+  - Restart nginx
+
+- name: create folder /opt/nginx/ansible
+  file:
+         path: /opt/nginx/ansible
+         state: directory
+
+- name: copy index.php
+  copy:
+        src: /home/anti/share/ansible/nginx_php_fpm/index.php
+        dest: /opt/nginx/ansible/index.php
+  notify: 
+  - Restart nginx
+
